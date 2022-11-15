@@ -25,15 +25,21 @@ function Home() {
                     direction="column"
                     h="100vh"
                 >
-                    <Card  shadow="sm" p="lg" radius="md" mih="600px" miw="1400px" withBorder>  
+                    <Card  shadow="sm" p="lg" radius="lg" mih="400px" miw="1000px" withBorder>  
                         <Flex
-                            gap="md"
+                            gap="150px"
                             justify="center"
                             align="center"
-                            direction="row"   
+                            direction="row" 
+                            h="100%"  
                         >
-                            <Button color="cyan" radius="lg" size="xl">Residentes</Button>
-                            <Button color="cyan" radius="lg" size="xl">Pagos</Button>              
+                            <div style={{ width: 300 }}>
+                                <Button fullWidth color="cyan" radius="lg" size="xl">Residentes</Button>
+                            </div>
+                            
+                            <div style={{ width: 300}}>
+                                <Button fullWidth color="cyan" radius="lg" size="xl">Pagos</Button>      
+                            </div>        
                         </Flex>
                     </Card> 
                 </Flex>

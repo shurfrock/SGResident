@@ -21,6 +21,7 @@ function Login(){
                     justify="center"
                     align="center"
                     direction="row"   
+                    h="100%"
                     >
                     <Modal
                         onClose={() => setOpened(false)}
@@ -75,45 +76,5 @@ function Login(){
     </MainLayout>) 
 
 } 
-
-/* function Login(){
-    return( 
-    <MainLayout>
-        <Flex
-            justify="center"
-            align="center"
-            direction="column"
-            h="100vh"
-        >
-            <Card  shadow="sm" p="lg" radius="xl" miw="600px" withBorder>  
-        
-                <Flex
-                    gap="lg"
-                    direction="column" 
-                    >   
-                    <TextInput
-                        placeholder="Nombre Usuario"
-                        label="Nombre Usuario"
-                        radius="lg"
-                        size="sm"
-                        withAsterisk
-                    />    
-                    <PasswordInput
-                        placeholder="Contraseña"
-                        label="Contraseña"
-                        description="La contraseña debe incluir al menos una letra, un número."
-                        radius="lg"
-                        size="sm"
-                        withAsterisk
-                    />  
-                    <Button color="cyan" radius="lg" size="md">
-                        Siguiente
-                    </Button> 
-                </Flex>    
-            </Card>
-        </Flex>
-    </MainLayout>) 
-
-} */
 
 export default Login
