@@ -1,9 +1,12 @@
 import MainLayout from "../layouts/MainLayout"
 
+import { useNavigate } from "react-router-dom";
 import { Flex, Card, TextInput, PasswordInput, Button, Checkbox, Grid } from '@mantine/core';
 
 
-function Register() {
+function Register() {  
+    const navigate = useNavigate();
+
     return (
         <MainLayout>
             <Flex
@@ -65,7 +68,7 @@ function Register() {
                             radius="xs"
                             size="sm"
                         />
-                        <Button color="cyan" radius="lg" size="md">
+                        <Button color="cyan" radius="lg" size="md" onClick={() => navigate('/login')}>
                             Siguiente
                         </Button> 
                     </Flex>    

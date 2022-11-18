@@ -1,10 +1,12 @@
 import MainLayout from "../layouts/MainLayout"
 
 import { useState } from 'react';
+import { useNavigate } from "react-router-dom";
 import { Flex ,Card , Button, TextInput, PasswordInput, Modal, Group, Checkbox} from '@mantine/core';
 
 
 function Login(){
+    const navigate = useNavigate();
     const [opened, setOpened] = useState(false);
 
     return( 
@@ -59,7 +61,7 @@ function Login(){
                                     radius="xs"
                                     size="sm"
                                 />
-                                <Button color="cyan" radius="lg" size="md">
+                                <Button color="cyan" radius="lg" size="md" onClick={() => navigate('/home')}>
                                     Siguiente
                                 </Button> 
                             </Flex>    
@@ -69,7 +71,7 @@ function Login(){
                         <Button  onClick={() => setOpened(true)} variant="subtle" color="cyan" radius="lg" size="xl">Iniciar Sesion</Button>
                     </Group>
                     
-                    <Button variant="subtle" color="cyan" radius="lg" size="xl">Registrarse</Button>
+                    <Button variant="subtle" color="cyan" radius="lg" size="xl" onClick={() => navigate('/register')}>Registrarse</Button>
                 </Flex>
             </Card>
         </Flex>
