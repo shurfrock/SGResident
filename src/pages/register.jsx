@@ -1,7 +1,8 @@
 import MainLayout from "../layouts/MainLayout"
 
 import { useNavigate } from "react-router-dom";
-import { Flex, Card, TextInput, PasswordInput, Button, Checkbox, Grid } from '@mantine/core';
+import { FaArrowLeft } from "react-icons/fa";
+import { Flex, Card, TextInput, PasswordInput, Button, Grid } from '@mantine/core';
 
 
 function Register() {  
@@ -15,7 +16,8 @@ function Register() {
                 direction="column"
                 h="100vh"
             >
-                <Card  shadow="sm" p="lg" radius="lg" miw="600px" withBorder>  
+                <Card  shadow="sm" p="lg" radius="lg" miw="600px" withBorder>
+                <FaArrowLeft size="20px" color="#1FBFBE" onClick={() => navigate('/')}/>    
                     <Flex
                         gap="lg"
                         direction="column" 
@@ -62,13 +64,7 @@ function Register() {
                             size="sm"
                             withAsterisk
                         />
-                        <Checkbox
-                            label="Acepto vender mi privacidad"
-                            color="cyan"
-                            radius="xs"
-                            size="sm"
-                        />
-                        <Button color="cyan" radius="lg" size="md" onClick={() => navigate('/login')}>
+                        <Button color="cyan" radius="lg" size="md" onClick={() => navigate('/')}>
                             Siguiente
                         </Button> 
                     </Flex>    

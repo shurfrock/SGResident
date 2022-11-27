@@ -1,8 +1,9 @@
 import MainLayout from "../layouts/MainLayout";
 
+import { FaRegMoneyBillAlt, FaUserFriends } from "react-icons/fa";
 import { useState } from 'react';
 import { useNavigate } from "react-router-dom";
-import { Flex ,Card, AppShell, Header, Title, Button, Avatar, Modal} from '@mantine/core';
+import { Flex, Card, AppShell, Header, Title, Button, Avatar, Modal, Space, Text } from '@mantine/core';
 
 function Home() {
     const navigate = useNavigate();
@@ -22,10 +23,13 @@ function Home() {
                     wrap="wrap"
                     direction="column"
                 >
-                    <Avatar alt="Usuario" color="cyan" radius="xl" size="xl" variant="filled" />
-                    <Title order={3} size="h4" c= "cyan"> Nombre Completo </Title>
-                    <Title order={3} size="h4" c= "cyan"> Nombre de Usuario </Title>
-                    
+                    <Avatar alt="Usuario" color="cyan" radius="xl" size="100px" variant="filled" />
+                    <Space h="35px" />
+                    <Title order={3} size="h3" c= "cyan"> Nombre Completo </Title>
+                    <Text fz="lg"> Nombre Completo </Text>
+                    <Title order={3} size="h3" c= "cyan"> Nombre de Usuario </Title>
+                    <Text fz="lg"> Nombre de Usuario </Text>
+                    <Space h="35px" />
                 </Flex>
                 <Flex
                     gap="md"
@@ -34,11 +38,9 @@ function Home() {
                     direction="row"
                 >
                     <Button color="cyan" radius="lg" onClick={() => setOpened(false)}>Atras</Button>
-                    <Button color="red" radius="lg" onClick={() => navigate('/login')}>Salir</Button>
-                </Flex>
-                
+                    <Button color="red" radius="lg" onClick={() => navigate('/')}>Salir</Button>
+                </Flex>    
             </Modal>
-
             <AppShell
                 padding="xs"
                 header={
@@ -50,7 +52,6 @@ function Home() {
                              direction="row" 
                              h="100%"  
                         >
-                            
                             <Title order={3} size="h1" c= "cyan"> SGResident </Title>
                             <Avatar alt="Usuario" color="cyan" radius="xl" size="md" variant="filled" onClick={() => setOpened(true)}/>
                         </Flex>
@@ -62,26 +63,35 @@ function Home() {
                     direction="column"
                     h="100vh"
                 >
-                    <Card  shadow="sm" p="lg" radius="lg" mih="400px" miw="1000px" withBorder>  
-                    
+                    <Card  shadow="sm" p="lg" radius="lg" mih="400px" miw="1000px" withBorder> 
                         <Flex
-                            gap="150px"
+                            gap="70px"
                             justify="center"
                             align="center"
                             direction="row" 
                             h="100%"  
                         >
-                            <div style={{ width: 300 }}>
-                                <Button fullWidth color="cyan" radius="lg" size="xl" onClick={() => navigate('/residents')}>Residentes</Button>
+                            <div style={{ width: 400 }}>
+                                <Button fullWidth color="cyan" radius="lg" size="xl" mih="170px" onClick={() => navigate('/residents')}> 
+                                    <Title order={3} size="h1">
+                                        Residentes
+                                    </Title>
+                                    <Space w="20px" />
+                                    <FaUserFriends size="150px"/>       
+                                </Button>
                             </div>
-                            
-                            <div style={{ width: 300}}>
-                                <Button fullWidth color="cyan" radius="lg" size="xl" onClick={() => navigate('/payments')}>Pagos</Button>      
-                            </div>        
+                            <div style={{ width: 400 }}>
+                                <Button fullWidth color="cyan" radius="lg" size="xl"mih="170px" onClick={() => navigate('/payments')}> 
+                                    <Title order={3} size="h1">
+                                        Pagos
+                                    </Title>
+                                    <Space w="50px" />
+                                    <FaRegMoneyBillAlt size="150px"/>
+                                </Button>  
+                            </div>             
                         </Flex>
                     </Card> 
                 </Flex>
-
             </AppShell>
         </MainLayout>
     )

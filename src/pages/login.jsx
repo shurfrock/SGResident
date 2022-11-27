@@ -2,8 +2,9 @@ import MainLayout from "../layouts/MainLayout"
 
 import { useState } from 'react';
 import { useNavigate } from "react-router-dom";
-import { Flex ,Card , Button, TextInput, PasswordInput, Modal, Group, Checkbox} from '@mantine/core';
+import { Flex ,Card , Button, TextInput, PasswordInput, Modal, Group, Image, Space } from '@mantine/core';
 
+import SGResidentWhite from '../assets/SGResidentWhite.png';
 
 function Login(){
     const navigate = useNavigate();
@@ -17,6 +18,20 @@ function Login(){
             direction="column"
             h="100vh"
         >
+            <Flex
+                gap="md"
+                justify="flex-end"
+                align="center"
+                direction="row"
+                wrap="wrap"
+            >
+                <Image
+                    height={100} 
+                    fit="contain"
+                    src={SGResidentWhite}
+                />
+            </Flex> 
+            <Space h="50px" />
             <Card  shadow="sm" p="lg" radius="xl" mih="400px" miw="400px" withBorder>  
                 <Flex
                     gap="md"
@@ -36,35 +51,29 @@ function Login(){
                         transition="fade"
                         transitionDuration={600}
                         transitionTimingFunction="ease"
-                    >
-                            <Flex
-                                gap="xl"
-                                direction="column" 
-                                >   
-                                <TextInput
-                                    placeholder="Nombre de Usuario"
-                                    label="Usuario"
-                                    radius="lg"
-                                    size="sm"
-                                    withAsterisk
-                                />    
-                                <PasswordInput
-                                    placeholder="Contraseña"
-                                    label="Contraseña"
-                                    radius="lg"
-                                    size="sm"
-                                    withAsterisk
-                                />  
-                                <Checkbox
-                                    label="Acepto vender mi privacidad"
-                                    color="cyan"
-                                    radius="xs"
-                                    size="sm"
-                                />
-                                <Button color="cyan" radius="lg" size="md" onClick={() => navigate('/home')}>
-                                    Siguiente
-                                </Button> 
-                            </Flex>    
+                    >  
+                        <Flex
+                            gap="xl"
+                            direction="column" 
+                            >     
+                            <TextInput
+                                placeholder="Nombre de Usuario"
+                                label="Usuario"
+                                radius="lg"
+                                size="sm"
+                                withAsterisk
+                            />    
+                            <PasswordInput
+                                placeholder="Contraseña"
+                                label="Contraseña"
+                                radius="lg"
+                                size="sm"
+                                withAsterisk
+                            />  
+                            <Button color="cyan" radius="lg" size="md" onClick={() => navigate('/home')}>
+                                Siguiente
+                            </Button> 
+                        </Flex>    
                     </Modal>
 
                     <Group position="center">

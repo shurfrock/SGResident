@@ -2,11 +2,11 @@ import MainLayout from "../layouts/MainLayout"
 
 import { useState } from 'react';
 import { IconAlertCircle } from '@tabler/icons';
+import { FaArrowLeft , FaTrashAlt, FaExclamationCircle, FaPen, FaPrint, FaSearch } from "react-icons/fa";
 import { TimeInput, DatePicker} from '@mantine/dates';
 import { useNavigate } from "react-router-dom";
-import { Flex, Card, Grid, TextInput, Title, Button, Modal, Table, Select, Alert, Text, Space, Image} from '@mantine/core';
+import { Flex, Card, Grid, TextInput, Title, Button, Modal, Table, Select, Alert, Text, Space, Image, LoadingOverlay, Loader } from '@mantine/core';
 
-import SGResident from '../assets/SGResident.png';
 import SGResidentWhite from '../assets/SGResidentWhite.png';
 
 function Payments(){
@@ -15,7 +15,8 @@ function Payments(){
     const [opened_add, setOpened_add] = useState(false);
     const [opened_mod, setOpened_mod] = useState(false);
     const [opened_det, setOpened_det] = useState(false);
-
+    const [opened_pri, setOpened_pri] = useState(false);
+    const [visible, setVisible] = useState(false);
     const elements = [{ domicilio: 0, vialidad: 0, phoneNumber: 0, name: 0 , entre_vialidad_2: 0, referencia: 0, edad: 0, sexo: 0, situacion: 0, pagos_atrasados: 0, meses_pagados: 0, tipo_de_pago: 0, fecha: 0, hora: 0, cantidad: 0 }];
 
     const rows = elements.map((element) => ( 
@@ -28,24 +29,25 @@ function Payments(){
             <Grid>
                 <Grid.Col span={3} offset={3}>
                     <td>
-                        <Button color="yellow" radius="lg" size="xs" onClick={() => setOpened_mod(true)}>
-                            Modificar
+                        <Button color="yellow" radius="xl" size="sm" onClick={() => setOpened_mod(true)}>
+                            <FaPen size="20px" color="white" />
                         </Button> 
                     </td>
                     <td>
-                        <Button color="cyan" radius="lg" size="xs" onClick={() => setOpened_det(true)}>
-                            Detalles
+                        <Button color="cyan" radius="xl" size="sm" onClick={() => setOpened_det(true)}>
+                            <FaExclamationCircle size="20px" color="white" />
                         </Button> 
                     </td>
                     <td>
-                        <Button color="red" radius="lg" size="xs" onClick={() => setOpened(true)}>
-                            Eliminar
+                        <Button color="red" radius="xl" size="sm" onClick={() => setOpened(true)}>
+                            <FaTrashAlt size="20px" color="white" />   
                         </Button> 
                     </td>
                     <td>
-                        <Button color="indigo" radius="lg" size="xs">
-                            Imprimir
+                        <Button color="indigo" radius="xl" size="sm" onClick={() => setOpened_pri(true)}>
+                            <FaPrint size="20px" color="white" />   
                         </Button> 
+                        
                     </td>
                 </Grid.Col>
             </Grid>
@@ -92,14 +94,39 @@ function Payments(){
 
     return (
         <MainLayout>
+            <Space h="50px" />
             <Flex
                 justify="center"
                 align="center"
                 direction="column"
-                h="100vh"
-                >
+            >
                 <Card  shadow="sm" p="lg" radius="md" mih="600px" miw="1400px" withBorder> 
+                    <FaArrowLeft size="20px" color="#7AC4C5" onClick={() => navigate('/Residents')}/>
                     <Title align="center" size={35}  fw={700} c= "cyan">Pagos</Title> 
+                    <Modal
+                        opened={opened_pri}
+                        onClose={() => setOpened_pri(false)}
+                        centered
+                        size="md"
+                        overlayOpacity={0.55}
+                        overlayBlur={3}
+                        transitionDuration={600}
+                        transitionTimingFunction="ease"
+                    >
+                        <Flex
+                            justify="center"
+                            align="center"
+                            direction="column"
+                        >
+                            <Title align="center" size={25}  fw={700} c= "violet">
+                                Se imprimira el ultimo pago realizado...
+                            </Title>
+                            <Space h="50px" />
+                            <Loader color="violet" size="xl" variant="dots" transitionDuration={100} />
+                            <Space h="50px" />
+                            <Button onClick={() => setOpened_pri(false)} color="gray" radius="lg" size="lg">Cancelar</Button>
+                        </Flex>
+                    </Modal>
                     <Modal
                         onClose={() => setOpened(false)}
                         centered
@@ -118,14 +145,12 @@ function Payments(){
                             align="center"
                             direction="row"
                             wrap="wrap"
-                        >
-                            
+                        >   
                             <Alert icon={<IconAlertCircle size={16} />} title="¡Atencion!" color="red">
                                 Al borrar la informacion del Pago, se borrara el ultimo pago agregado y no se podra volver a acceder a esta informacion.
                             </Alert>
-
                                 <Button  onClick={() => setOpened(false)} color="gray" radius="lg" size="md">Cancelar</Button>
-                                <Button color="red"radius="lg" size="md">Eliminar</Button> 
+                                <Button color="red"radius="lg" size="md" onClick={() => setOpened(false)} >Eliminar</Button> 
                         </Flex>
                     </Modal> 
                     <Modal
@@ -233,7 +258,7 @@ function Payments(){
                                     direction="row"
                                     wrap="wrap"
                                     >
-                                        <Button color="green" radius="lg" size="md">Agregar Pago</Button>
+                                        <Button onClick={() => setOpened_add(false)} color="green" radius="lg" size="md">Agregar Pago</Button>
                                 </Flex> 
                             </Grid.Col>  
                         </Grid> 
@@ -295,7 +320,8 @@ function Payments(){
                                 </tr>
                             </thead> 
                             <tbody>{rows_4}</tbody>
-                        </Table>       
+                        </Table>   
+                        <Space h="25px" />    
                         <Grid gutter="xl">
                             <Grid.Col span={4}  offset={4}> 
                                 <Flex
@@ -305,7 +331,7 @@ function Payments(){
                                     direction="row"
                                     >
                                     <Button onClick={() => setOpened_det(false)} color="gray" radius="lg" size="md">Cancelar</Button>
-                                    <Button color="cyan" radius="lg" size="md">Guardar</Button>
+                                    <Button onClick={() => setOpened_det(false)} color="cyan" radius="lg" size="md">Guardar</Button>
                                 </Flex> 
                             </Grid.Col>  
                         </Grid>
@@ -329,10 +355,24 @@ function Payments(){
                                     <th>Hora</th>
                                     <th>Cantidad</th>
                                     <th></th>
+                                    <Button color="yellow" radius="xl" size="sm" onClick={() => setOpened_mod(true)}>
+                                        <FaPen size="20px" color="white" />
+                                    </Button> 
                                 </tr>
                             </thead> 
                             <tbody>{rows_4}</tbody>
                         </Table> 
+                        <Space h="25px" />
+                        <Flex
+                            gap="md"
+                            justify="center"
+                            align="flex-end"
+                            direction="row"
+                            wrap="wrap"
+                            >
+                            <Button onClick={() => setOpened_mod(false)} color="gray" radius="lg" size="md">Cancelar</Button>
+                            <Button onClick={() => setOpened_mod(false)} color="yellow" radius="lg" size="md">Guardar</Button>
+                        </Flex>
                     </Modal> 
                     <Flex
                         gap="md"
@@ -341,6 +381,7 @@ function Payments(){
                         direction="row"
                         wrap="wrap"
                     >
+                        <FaSearch size="20px" color="#7AC4C5" />
                         <Button color="green" radius="lg" size="md" onClick={() => setOpened_add(true)}>
                             Agregar
                         </Button>   

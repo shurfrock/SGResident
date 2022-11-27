@@ -2,10 +2,10 @@ import MainLayout from "../layouts/MainLayout";
 
 import { useState } from 'react';
 import { IconAlertCircle } from '@tabler/icons';
+import { FaArrowLeft, FaTrashAlt, FaExclamationCircle, FaPen, FaSearch } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { Flex, Card, Grid, TextInput, Title, Text, Button, Modal, Table, Select, Alert, Space, Image} from '@mantine/core';
 
-import SGResident from '../assets/SGResident.png';
 import SGResidentWhite from '../assets/SGResidentWhite.png';
 
 function Residents(){ 
@@ -27,18 +27,18 @@ function Residents(){
             <Grid>
                 <Grid.Col span={3} offset={3}>
                     <td>
-                        <Button color="yellow" radius="lg" size="xs" onClick={() => setOpened_mod(true)}>
-                            Modificar
+                        <Button color="yellow" radius="xl" size="sm" onClick={() => setOpened_mod(true)}>
+                            <FaPen size="20px" color="white" />
                         </Button> 
                     </td>
                     <td>
-                        <Button color="cyan" radius="lg" size="xs" onClick={() => setOpened_det(true)}>
-                            Detalles
+                        <Button color="cyan" radius="xl" size="sm" onClick={() => setOpened_det(true)}>
+                            <FaExclamationCircle size="20px" color="white" />
                         </Button> 
                     </td>
                     <td>
-                        <Button color="red" radius="lg" size="xs" onClick={() => setOpened(true)}>
-                            Eliminar
+                        <Button color="red" radius="xl" size="sm" onClick={() => setOpened(true)}>
+                            <FaTrashAlt size="20px" color="white" />   
                         </Button> 
                     </td>
                 </Grid.Col>
@@ -50,15 +50,14 @@ function Residents(){
 
     return(
         <MainLayout>
-            
+                <Space h="50px" />
                 <Flex
                     justify="center"
                     align="center"
                     direction="column"
-                    h="100vh"
-                >   
-                           
+                >            
                     <Card  shadow="sm" p="lg" radius="md" mih="600px" miw="1400px" withBorder> 
+                        <FaArrowLeft size="20px" color="#7AC4C5" onClick={() => navigate('/home')}/>  
                         <Title align="center" size={35}  fw={700} c= "cyan">Residentes</Title> 
                         <Modal
                             onClose={() => setOpened(false)}
@@ -83,8 +82,8 @@ function Residents(){
                                     Al borrar la informacion del Residente la informacion del residente y los pagos y no se podra volver a acceder a esta informacion.
                                 </Alert>
 
-                                    <Button  onClick={() => setOpened(false)} color="gray" radius="lg" size="md">Cancelar</Button>
-                                    <Button color="red"radius="lg" size="md">Eliminar</Button> 
+                                    <Button onClick={() => setOpened(false)} color="gray" radius="lg" size="md">Cancelar</Button>
+                                    <Button onClick={() => setOpened(false)} color="red"radius="lg" size="md">Eliminar</Button> 
                             </Flex>
                         </Modal> 
                         <Modal
@@ -107,16 +106,7 @@ function Residents(){
                                         size="sm"
                                         withAsterisk
                                     />   
-                                </Grid.Col>
-                                <Grid.Col span={4}>
-                                    <Image
-                                        height={70}
-                                        fit="contain"
-                                        src={SGResident}
-                                    />
-                                </Grid.Col>
-                                
-                                
+                                </Grid.Col>  
                             </Grid> 
                             <Grid>
                                 <Grid.Col span={5}>
@@ -169,6 +159,7 @@ function Residents(){
                             </Grid> 
                             <Grid verticalSpacing="xl">
                                 <Grid.Col span={4}  offset={4}> 
+                                    <Space h="20px" />
                                     <Flex
                                         mih={15}
                                         gap="md"
@@ -177,11 +168,10 @@ function Residents(){
                                         direction="row"
                                         wrap="wrap"
                                         >
-                                            <Button color="green" radius="lg" size="md">Agregar</Button>
+                                            <Button color="green" radius="lg" size="lg" onClick={() => setOpened_add(false)}>Agregar</Button>
                                     </Flex> 
                                 </Grid.Col>  
-                            </Grid> 
-                            
+                            </Grid>                             
                         </Modal> 
                         <Modal
                             onClose={() => setOpened_det(false)}
@@ -231,8 +221,7 @@ function Residents(){
                                     align="flex-end"
                                     direction="row"
                                     >
-                                    <Button onClick={() => setOpened_det(false)} color="gray" radius="lg" size="md">Atras</Button>
-                                    <Button color="cyan" radius="lg" size="md">Siguiente</Button>
+                                    <Button color="cyan" radius="lg" size="md" onClick={() => setOpened_det(false)} >Atras</Button>
                                 </Flex>   
                              
                         </Modal> 
@@ -333,7 +322,7 @@ function Residents(){
                                         wrap="wrap"
                                         >
                                         <Button onClick={() => setOpened_mod(false)} color="gray" radius="lg" size="md">Cancelar</Button>
-                                        <Button color="yellow" radius="lg" size="md">Guardar</Button>
+                                        <Button onClick={() => setOpened_mod(false)} color="yellow" radius="lg" size="md">Guardar</Button>
                                     </Flex> 
                                 </Grid.Col>  
                             </Grid>        
@@ -345,6 +334,7 @@ function Residents(){
                             direction="row"
                             wrap="wrap"
                         >
+                            <FaSearch size="20px" color="#7AC4C5" />
                             <Button color="indigo" radius="lg" size="md" onClick={() => navigate('/payments')}>
                                 Pagos
                             </Button> 
