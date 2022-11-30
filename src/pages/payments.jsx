@@ -3,20 +3,17 @@ import MainLayout from "../layouts/MainLayout"
 import { useState } from 'react';
 import { IconAlertCircle } from '@tabler/icons';
 import { FaArrowLeft , FaTrashAlt, FaExclamationCircle, FaPen, FaPrint, FaSearch } from "react-icons/fa";
-import { TimeInput, DatePicker} from '@mantine/dates';
 import { useNavigate } from "react-router-dom";
-import { Flex, Card, Grid, TextInput, Title, Button, Modal, Table, Select, Alert, Text, Space, Image, LoadingOverlay, Loader } from '@mantine/core';
+import { Flex, Card, Grid, Title, Button, Modal, Table, Alert, Text, Space, Image, Loader } from '@mantine/core';
 
 import SGResidentWhite from '../assets/SGResidentWhite.png';
 
 function Payments(){
     const [opened, setOpened] = useState(false);
     const navigate = useNavigate();
-    const [opened_add, setOpened_add] = useState(false);
     const [opened_mod, setOpened_mod] = useState(false);
     const [opened_det, setOpened_det] = useState(false);
     const [opened_pri, setOpened_pri] = useState(false);
-    const [visible, setVisible] = useState(false);
     const elements = [{ domicilio: 0, vialidad: 0, phoneNumber: 0, name: 0 , entre_vialidad_2: 0, referencia: 0, edad: 0, sexo: 0, situacion: 0, pagos_atrasados: 0, meses_pagados: 0, tipo_de_pago: 0, fecha: 0, hora: 0, cantidad: 0 }];
 
     const rows = elements.map((element) => ( 
@@ -25,33 +22,25 @@ function Payments(){
             <td>{element.name}</td>
             <td>{element.phoneNumber}</td>
             <td>{element.vialidad}</td>
-
-            <Grid>
-                <Grid.Col span={3} offset={3}>
-                    <td>
-                        <Button color="yellow" radius="xl" size="sm" onClick={() => setOpened_mod(true)}>
-                            <FaPen size="20px" color="white" />
-                        </Button> 
-                    </td>
-                    <td>
-                        <Button color="cyan" radius="xl" size="sm" onClick={() => setOpened_det(true)}>
-                            <FaExclamationCircle size="20px" color="white" />
-                        </Button> 
-                    </td>
-                    <td>
-                        <Button color="red" radius="xl" size="sm" onClick={() => setOpened(true)}>
-                            <FaTrashAlt size="20px" color="white" />   
-                        </Button> 
-                    </td>
-                    <td>
-                        <Button color="indigo" radius="xl" size="sm" onClick={() => setOpened_pri(true)}>
-                            <FaPrint size="20px" color="white" />   
-                        </Button> 
-                        
-                    </td>
-                </Grid.Col>
-            </Grid>
-
+            <td>
+                <Flex justify="center" align="center" gap="lg">
+                    <Button color="yellow" radius="xl" size="sm" onClick={() => setOpened_mod(true)}>
+                        <FaPen size="20px" color="white" />
+                    </Button> 
+                
+                    <Button color="cyan" radius="xl" size="sm" onClick={() => setOpened_det(true)}>
+                        <FaExclamationCircle size="20px" color="white" />
+                    </Button> 
+                
+                    <Button color="red" radius="xl" size="sm" onClick={() => setOpened(true)}>
+                        <FaTrashAlt size="20px" color="white" />   
+                    </Button> 
+                
+                    <Button color="indigo" radius="xl" size="sm" onClick={() => setOpened_pri(true)}>
+                        <FaPrint size="20px" color="white" />   
+                    </Button>    
+                </Flex>
+            </td>
         </tr>       
       
     ));
@@ -110,8 +99,6 @@ function Payments(){
                         size="md"
                         overlayOpacity={0.55}
                         overlayBlur={3}
-                        transitionDuration={600}
-                        transitionTimingFunction="ease"
                     >
                         <Flex
                             justify="center"
@@ -122,7 +109,7 @@ function Payments(){
                                 Se imprimira el ultimo pago realizado...
                             </Title>
                             <Space h="50px" />
-                            <Loader color="violet" size="xl" variant="dots" transitionDuration={100} />
+                            <Loader color="violet" size="xl" variant="dots" />
                             <Space h="50px" />
                             <Button onClick={() => setOpened_pri(false)} color="gray" radius="lg" size="lg">Cancelar</Button>
                         </Flex>
@@ -135,8 +122,6 @@ function Payments(){
                         opened={opened}
                         overlayOpacity={0.55}
                         overlayBlur={3}
-                        transitionDuration={600}
-                        transitionTimingFunction="ease"
                     >      
                         <Flex
                             mih={15}
@@ -147,122 +132,12 @@ function Payments(){
                             wrap="wrap"
                         >   
                             <Alert icon={<IconAlertCircle size={16} />} title="¡Atencion!" color="red">
-                                Al borrar la informacion del Pago, se borrara el ultimo pago agregado y no se podra volver a acceder a esta informacion.
+                                Al eliminar esta informacion del pago no se borrara en su totalidad del sistema, entrara en un estado de inactividad.
                             </Alert>
                                 <Button  onClick={() => setOpened(false)} color="gray" radius="lg" size="md">Cancelar</Button>
                                 <Button color="red"radius="lg" size="md" onClick={() => setOpened(false)} >Eliminar</Button> 
                         </Flex>
-                    </Modal> 
-                    <Modal
-                        onClose={() => setOpened_add(false)}
-                        centered
-                        size="50%"
-                        title="Agregar Pago"
-                        opened={opened_add}
-                        overlayOpacity={0.55}
-                        overlayBlur={3}
-                        transitionDuration={600}
-                        transitionTimingFunction="ease"
-                    >      
-                        <Grid>
-                            <Grid.Col span={7}>
-                                <TextInput
-                                    placeholder="Nombre Titular"
-                                    label="Nombre Titular"
-                                    radius="lg"
-                                    size="sm"
-                                    withAsterisk
-                                />   
-                                <Space h="sm" />
-                                <TextInput
-                                    placeholder="Quien realiza el pago"
-                                    label="Quien realiza el pago"
-                                    radius="lg"
-                                    size="sm"
-                                    withAsterisk
-                                /> 
-                            </Grid.Col>  
-                            <Grid.Col span={6}>
-                                <TextInput
-                                    placeholder="Domicilio"
-                                    label="Domicilio"
-                                    radius="lg"
-                                    size="sm"
-                                    withAsterisk
-                                />   
-                            </Grid.Col>   
-                            <Grid.Col span={3}> 
-                                <TimeInput
-                                    defaultValue={new Date()}
-                                    radius="lg"
-                                    label="Hora"
-                                    format="12"
-                                    amLabel="AM"
-                                    pmLabel="PM"
-                                    withAsterisk
-                                />
-                            </Grid.Col>  
-                            <Grid.Col span={3}> 
-                                <DatePicker
-                                    defaultValue={new Date()}
-                                    radius="lg"
-                                    placeholder="Fecha"
-                                    label="Fecha"
-                                    inputFormat="MM/DD/YYYY"
-                                    labelFormat="MM/YYYY"
-                                    withAsterisk
-                                    />
-                            </Grid.Col>  
-                            <Grid.Col span={5}>
-                                <TextInput
-                                    placeholder="Concepto"
-                                    label="Concepto"
-                                    radius="lg"
-                                    size="sm"
-                                    withAsterisk
-                                />   
-                            </Grid.Col>   
-                            <Grid.Col span={6}> 
-                                <Text fz="md" fw={500}>Cantidad a pagar</Text>
-                                <Text fz="md">$320.00(trescientos veinte pesos)</Text>
-                            </Grid.Col>  
-                            <Grid.Col span={5}>
-                                <TextInput
-                                    placeholder="Cantidad Recibida"
-                                    label="Cantidad Recibida"
-                                    radius="lg"
-                                    size="sm"
-                                    withAsterisk
-                                />  
-                            </Grid.Col>
-                            <Grid.Col span={4}> 
-                                <Select
-                                        label="Tipo de Pago"
-                                        placeholder="Tipo de Pago"
-                                        data={[
-                                            { value: 'Efectivo', label: 'Efectivo' },
-                                            { value: 'Transferencia', label: 'Transferencia' },
-                                            { value: 'Deposito', label: 'Deposito' },
-                                            { value: 'Cheque', label: 'Cheque' },
-                                        ]}
-                                        
-                                        radius="lg"
-                                    />
-                            </Grid.Col>
-                            <Grid.Col span={4}  offset={4}> 
-                                <Flex
-                                    mih={15}
-                                    gap="md"
-                                    justify="center"
-                                    align="flex-end"
-                                    direction="row"
-                                    wrap="wrap"
-                                    >
-                                        <Button onClick={() => setOpened_add(false)} color="green" radius="lg" size="md">Agregar Pago</Button>
-                                </Flex> 
-                            </Grid.Col>  
-                        </Grid> 
-                    </Modal> 
+                    </Modal>  
                     <Modal
                         onClose={() => setOpened_det(false)}
                         centered
@@ -271,8 +146,6 @@ function Payments(){
                         opened={opened_det}
                         overlayOpacity={0.55}
                         overlayBlur={3}
-                        transitionDuration={600}
-                        transitionTimingFunction="ease"
                     >   
                          <Table  striped horizontalSpacing="md" verticalSpacing="md" fontSize="md">
                             <thead>
@@ -344,8 +217,6 @@ function Payments(){
                         opened={opened_mod}
                         overlayOpacity={0.55}
                         overlayBlur={3}
-                        transitionDuration={600}
-                        transitionTimingFunction="ease"
                     >      
                          <Table  striped horizontalSpacing="md" verticalSpacing="md" fontSize="md">
                             <thead>
@@ -354,10 +225,13 @@ function Payments(){
                                     <th>Fecha</th>
                                     <th>Hora</th>
                                     <th>Cantidad</th>
-                                    <th></th>
-                                    <Button color="yellow" radius="xl" size="sm" onClick={() => setOpened_mod(true)}>
-                                        <FaPen size="20px" color="white" />
-                                    </Button> 
+                                    <th>
+                                        <Flex justify="center" align="center" gap="lg">
+                                            <Button color="yellow" radius="xl" size="sm" onClick={() => setOpened_mod(true)}>
+                                                <FaPen size="20px" color="white" />
+                                            </Button> 
+                                        </Flex>
+                                    </th>
                                 </tr>
                             </thead> 
                             <tbody>{rows_4}</tbody>
@@ -382,9 +256,6 @@ function Payments(){
                         wrap="wrap"
                     >
                         <FaSearch size="20px" color="#7AC4C5" />
-                        <Button color="green" radius="lg" size="md" onClick={() => setOpened_add(true)}>
-                            Agregar
-                        </Button>   
                     </Flex>
                     <Table  striped horizontalSpacing="lg" verticalSpacing="md" fontSize="lg">
                         <thead>

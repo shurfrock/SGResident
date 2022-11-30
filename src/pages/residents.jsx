@@ -1,48 +1,101 @@
 import MainLayout from "../layouts/MainLayout";
 
 import { useState } from 'react';
-import { IconAlertCircle } from '@tabler/icons';
-import { FaArrowLeft, FaTrashAlt, FaExclamationCircle, FaPen, FaSearch } from "react-icons/fa";
+import { z } from 'zod'
 import { useNavigate } from "react-router-dom";
-import { Flex, Card, Grid, TextInput, Title, Text, Button, Modal, Table, Select, Alert, Space, Image} from '@mantine/core';
+import { IconAlertCircle } from '@tabler/icons';
+import { useMutation } from "@tanstack/react-query";
+import { useForm, zodResolver } from '@mantine/form';
+import { TimeInput, DatePicker} from '@mantine/dates';
+import { Flex, Card, Grid, TextInput, Title, Text, Button, Modal, Table, Select, Alert, NativeSelect, Space, Image, NumberInput } from '@mantine/core';
+import { useQuery } from '@tanstack/react-query'
 
 import SGResidentWhite from '../assets/SGResidentWhite.png';
+import { FaArrowLeft, FaTrashAlt, FaExclamationCircle, FaPen, FaSearch, FaDonate } from "react-icons/fa";
+import axios from "../configs/axios";
+
+const schema = z.object({
+    name: z.string().min(5),
+    address: z.string().min(8),
+    phone: z.string().min(4),
+    age: z.number().min(2),
+    gender: z.string().min(3),
+    description: z.string().min(5),
+    firstRoad: z.string().min(5),
+    secondRoad: z.string().min(5),
+})
 
 function Residents(){ 
     const navigate = useNavigate();
+    const [error, setError] = useState('');
     const [opened, setOpened] = useState(false);
+    const [opened_addP, setOpened_addP] = useState(false);
     const [opened_add, setOpened_add] = useState(false);
     const [opened_mod, setOpened_mod] = useState(false);
     const [opened_det, setOpened_det] = useState(false);
+    const [datePicker, setDatePicker] = useState(new Date())
+    const [timeInput, setTimeInput] = useState(new Date())
+    const [selectedId, setSelectedId] = useState(null)
+    console.log("🚀 ~ file: residents.jsx:39 ~ Residents ~ selectedId", selectedId)
 
-    const elements = [{ domicilio: 0, vialidad: 0, phoneNumber: 0, name: 0 }];
+    const form = useForm({
+        validate: zodResolver(schema),
+        initialValues: {
+            name: '',
+            address: '',
+            phone: '',
+            age: '',
+            gender: '',
+            description: '',
+            firstRoad: '',
+            secondRoad: '',
+        },
+    })
 
-    const rows = elements.map((element) => ( 
-        <tr key={element.name}>    
-            <td>{element.domicilio}</td>
+    const { isLoading, data } = useQuery({
+        queryKey: ['resident'],
+        queryFn: () => axios.get('/resident').then(res => res.data),
+    })
+    console.log("🚀 ~ file: residents.jsx:59 ~ Residents ~ data", data)
+
+    const mutation = useMutation({
+        mutationFn: ({ name, address, phone, age, gender, description, firstRoad, secondRoad }) => axios.post('/resident', { name, address, phone, age, gender, description, firstRoad, secondRoad }),
+        onError: (error) => {
+            console.log()
+        },
+        onSuccess: () => {
+            setError('')
+            setOpened_add(false)
+        }
+    })
+
+    const handleOnSubmit = (values) => {
+        console.log(values)
+        mutation.mutate(values) 
+    }
+
+    const rows = (data || []).map((element) => ( 
+        <tr key={element.id}>    
+            <td>{element.address}</td>
             <td>{element.name}</td>
-            <td>{element.phoneNumber}</td>
-            <td>{element.vialidad}</td>
-
-            <Grid>
-                <Grid.Col span={3} offset={3}>
-                    <td>
-                        <Button color="yellow" radius="xl" size="sm" onClick={() => setOpened_mod(true)}>
-                            <FaPen size="20px" color="white" />
-                        </Button> 
-                    </td>
-                    <td>
-                        <Button color="cyan" radius="xl" size="sm" onClick={() => setOpened_det(true)}>
-                            <FaExclamationCircle size="20px" color="white" />
-                        </Button> 
-                    </td>
-                    <td>
-                        <Button color="red" radius="xl" size="sm" onClick={() => setOpened(true)}>
-                            <FaTrashAlt size="20px" color="white" />   
-                        </Button> 
-                    </td>
-                </Grid.Col>
-            </Grid>
+            <td>{element.phone}</td>
+            <td>{element.firstRoad}</td>
+            <td>
+                <Flex justify="center" align="center" gap="lg">
+                    <Button color="yellow" radius="xl" size="sm" onClick={() => { setSelectedId(element.id); setOpened_mod(true); }}>
+                        <FaPen size="20px" color="white" />
+                    </Button> 
+                    <Button color="cyan" radius="xl" size="sm" onClick={() => { setSelectedId(element.id); setOpened_det(true); }}>
+                        <FaExclamationCircle size="20px" color="white" />
+                    </Button> 
+                    <Button color="red" radius="xl" size="sm" onClick={() => { setSelectedId(element.id); setOpened(true); }}>
+                        <FaTrashAlt size="20px" color="white" />   
+                    </Button> 
+                    <Button color="green" radius="xl" size="sm" onClick={() => { setSelectedId(element.id); setOpened_addP(true); }}>
+                        <FaDonate size="20px" color="white"/>
+                    </Button>   
+                </Flex>
+            </td>
 
         </tr>       
       
@@ -56,9 +109,9 @@ function Residents(){
                     align="center"
                     direction="column"
                 >            
-                    <Card  shadow="sm" p="lg" radius="md" mih="600px" miw="1400px" withBorder> 
+                    <Card shadow="sm" p="lg" radius="md" mih="600px" miw="1400px" withBorder> 
                         <FaArrowLeft size="20px" color="#7AC4C5" onClick={() => navigate('/home')}/>  
-                        <Title align="center" size={35}  fw={700} c= "cyan">Residentes</Title> 
+                        <Title align="center" size={35} fw={700} c="cyan">Residentes</Title> 
                         <Modal
                             onClose={() => setOpened(false)}
                             centered
@@ -67,7 +120,6 @@ function Residents(){
                             opened={opened}
                             overlayOpacity={0.55}
                             overlayBlur={3}
-                            transitionDuration={600}
                             transitionTimingFunction="ease"
                         >      
                             <Flex
@@ -79,7 +131,7 @@ function Residents(){
                                 wrap="wrap"
                             >
                                 <Alert icon={<IconAlertCircle size={16} />} title="¡Atencion!" color="red">
-                                    Al borrar la informacion del Residente la informacion del residente y los pagos y no se podra volver a acceder a esta informacion.
+                                    Al eliminar esta informacion del residente no se borrara en su totalidad del sistema, entrara en un estado de inactividad.
                                 </Alert>
 
                                     <Button onClick={() => setOpened(false)} color="gray" radius="lg" size="md">Cancelar</Button>
@@ -87,29 +139,34 @@ function Residents(){
                             </Flex>
                         </Modal> 
                         <Modal
-                            onClose={() => setOpened_add(false)}
+                            onClose={() => setOpened_addP(false)}
                             centered
                             size="50%"
-                            title="Agregar Residente"
-                            opened={opened_add}
+                            title="Agregar Pago"
+                            opened={opened_addP}
                             overlayOpacity={0.55}
                             overlayBlur={3}
-                            transitionDuration={600}
                             transitionTimingFunction="ease"
                         >      
                             <Grid>
-                                <Grid.Col span={8}>
+                                <Grid.Col span={7}>
                                     <TextInput
-                                        placeholder="Nombre Completo"
-                                        label="Nombre Completo"
+                                        placeholder="Nombre Titular"
+                                        label="Nombre Titular"
                                         radius="lg"
                                         size="sm"
                                         withAsterisk
                                     />   
+                                    <Space h="sm" />
+                                    <TextInput
+                                        placeholder="Quien realiza el pago"
+                                        label="Quien realiza el pago"
+                                        radius="lg"
+                                        size="sm"
+                                        withAsterisk
+                                    /> 
                                 </Grid.Col>  
-                            </Grid> 
-                            <Grid>
-                                <Grid.Col span={5}>
+                                <Grid.Col span={6}>
                                     <TextInput
                                         placeholder="Domicilio"
                                         label="Domicilio"
@@ -119,47 +176,64 @@ function Residents(){
                                     />   
                                 </Grid.Col>   
                                 <Grid.Col span={3}> 
-                                    <TextInput
-                                        placeholder="Entre Vialidad - 1"
-                                        label="Entre Vialidad - 1"
+                                    <TimeInput
+                                        defaultValue={new Date()}
                                         radius="lg"
-                                        size="sm"
+                                        label="Hora"
+                                        format="12"
+                                        amLabel="AM"
+                                        pmLabel="PM"
                                         withAsterisk
-                                    /> 
+                                        value={timeInput}
+                                        onChange={setTimeInput}
+
+                                    />
                                 </Grid.Col>  
                                 <Grid.Col span={3}> 
-                                    <TextInput
-                                        placeholder="Entre Vialidad - 2"
-                                        label="Entre Vialidad - 2"
+                                    <DatePicker
+                                        defaultValue={new Date()}
                                         radius="lg"
-                                        size="sm"
+                                        placeholder="Fecha"
+                                        label="Fecha"
+                                        inputFormat="MM/DD/YYYY"
+                                        labelFormat="MM/YYYY"
                                         withAsterisk
-                                    /> 
+                                        value={datePicker}
+                                        onChange={setDatePicker}
+                                    />
                                 </Grid.Col>  
-                            </Grid> 
-                            <Grid>
                                 <Grid.Col span={5}>
-                                    <TextInput
-                                        placeholder="Telefono/Celular"
-                                        label="Telefono/Celular"
-                                        radius="lg"
-                                        size="sm"
-                                        withAsterisk
-                                    />   
+                                    <Text fz="md" fw={500}>Concepto</Text>
+                                    <Text fz="md">Pago de Residente</Text>
                                 </Grid.Col>   
                                 <Grid.Col span={6}> 
+                                    <Text fz="md" fw={500}>Cantidad a pagar</Text>
+                                    <Text fz="md">$320.00(trescientos veinte pesos)</Text>
+                                </Grid.Col>  
+                                <Grid.Col span={5}>
                                     <TextInput
-                                        placeholder="Referencia"
-                                        label="Referencia"
+                                        placeholder="Cantidad Recibida"
+                                        label="Cantidad Recibida"
                                         radius="lg"
                                         size="sm"
                                         withAsterisk
-                                    /> 
-                                </Grid.Col>  
-                            </Grid> 
-                            <Grid verticalSpacing="xl">
+                                    />  
+                                </Grid.Col>
+                                <Grid.Col span={4}> 
+                                    <Select
+                                            label="Tipo de Pago"
+                                            placeholder="Tipo de Pago"
+                                            data={[
+                                                { value: 'Efectivo', label: 'Efectivo' },
+                                                { value: 'Transferencia', label: 'Transferencia' },
+                                                { value: 'Deposito', label: 'Deposito' },
+                                                { value: 'Cheque', label: 'Cheque' },
+                                            ]}
+                                            
+                                            radius="lg"
+                                        />
+                                </Grid.Col>
                                 <Grid.Col span={4}  offset={4}> 
-                                    <Space h="20px" />
                                     <Flex
                                         mih={15}
                                         gap="md"
@@ -168,10 +242,126 @@ function Residents(){
                                         direction="row"
                                         wrap="wrap"
                                         >
-                                            <Button color="green" radius="lg" size="lg" onClick={() => setOpened_add(false)}>Agregar</Button>
+                                            <Button onClick={() => setOpened_addP(false)} color="green" radius="lg" size="md">Agregar Pago</Button>
                                     </Flex> 
                                 </Grid.Col>  
-                            </Grid>                             
+                            </Grid> 
+                        </Modal>
+                        <Modal
+                            onClose={() => setOpened_add(false)}
+                            centered
+                            size="50%"
+                            title="Agregar Residente"
+                            opened={opened_add}
+                            overlayOpacity={0.55}
+                            overlayBlur={3}
+                        >      
+                            {error && <Alert title="Error" color="red">
+                                    {error}
+                            </Alert>}  
+                            <form onSubmit={form.onSubmit(handleOnSubmit)}> 
+                                <Grid>
+                                    <Grid.Col span={8}>
+                                        <TextInput
+                                            placeholder="Nombre Completo"
+                                            label="Nombre Completo"
+                                            radius="lg"
+                                            size="sm"
+                                            withAsterisk
+                                            {...form.getInputProps('name')}
+                                        />   
+                                    </Grid.Col>  
+                                </Grid> 
+                                <Grid>
+                                    <Grid.Col span={5}>
+                                        <TextInput
+                                            placeholder="Domicilio"
+                                            label="Domicilio"
+                                            radius="lg"
+                                            size="sm"
+                                            withAsterisk
+                                            {...form.getInputProps('address')}
+                                        />   
+                                    </Grid.Col>   
+                                    <Grid.Col span={3}> 
+                                        <TextInput
+                                            placeholder="Entre Vialidad - 1"
+                                            label="Entre Vialidad - 1"
+                                            radius="lg"
+                                            size="sm"
+                                            withAsterisk
+                                            {...form.getInputProps('firstRoad')}
+                                        /> 
+                                    </Grid.Col>  
+                                    <Grid.Col span={3}> 
+                                        <TextInput
+                                            placeholder="Entre Vialidad - 2"
+                                            label="Entre Vialidad - 2"
+                                            radius="lg"
+                                            size="sm"
+                                            withAsterisk
+                                            {...form.getInputProps('secondRoad')}
+                                        /> 
+                                    </Grid.Col>  
+                                    <Grid.Col span={3}> 
+                                        <NativeSelect
+                                            data={['Otro', 'Masculino', 'Femenino']}
+                                            label="Sexo"
+                                            radius="lg"
+                                            withAsterisk
+                                            {...form.getInputProps('gender')}
+                                        />
+                                    </Grid.Col>
+                                    <Grid.Col span={3}> 
+                                        <NumberInput
+                                            defaultValue={0}
+                                            placeholder="Edad"
+                                            label="Edad"
+                                            size="sm"
+                                            radius="lg"
+                                            withAsterisk
+                                            {...form.getInputProps('age')}
+                                        />
+                                    </Grid.Col>
+                                </Grid> 
+                                <Grid>
+                                    <Grid.Col span={5}>
+                                        <TextInput
+                                            placeholder="Telefono/Celular"
+                                            label="Telefono/Celular"
+                                            radius="lg"
+                                            size="sm"
+                                            withAsterisk
+                                            {...form.getInputProps('phone')}
+                                        />   
+                                    </Grid.Col>   
+                                    <Grid.Col span={6}> 
+                                        <TextInput
+                                            placeholder="Referencia"
+                                            label="Referencia"
+                                            radius="lg"
+                                            size="sm"
+                                            withAsterisk
+                                            {...form.getInputProps('description')}
+                                        /> 
+                                    </Grid.Col>  
+                                </Grid> 
+                                <Grid>
+                                    <Grid.Col span={4}  offset={4}> 
+                                        <Space h="20px" />
+                                        <Flex
+                                            mih={15}
+                                            gap="md"
+                                            justify="center"
+                                            align="flex-end"
+                                            direction="row"
+                                            wrap="wrap"
+                                            >
+                                                <Button type="submit" color="green" radius="lg" size="lg" >Agregar</Button>
+                                        </Flex> 
+                                    </Grid.Col>  
+                                </Grid> 
+                            </form>                            
                         </Modal> 
                         <Modal
                             onClose={() => setOpened_det(false)}
@@ -181,8 +371,6 @@ function Residents(){
                             opened={opened_det}
                             overlayOpacity={0.55}
                             overlayBlur={3}
-                            transitionDuration={600}
-                            transitionTimingFunction="ease"
                         >    
                         
                             <Text fz="xl" fw={700}>Nombre Completo</Text>
@@ -234,8 +422,6 @@ function Residents(){
                             opened={opened_mod}
                             overlayOpacity={0.55}
                             overlayBlur={3}
-                            transitionDuration={600}
-                            transitionTimingFunction="ease"
                         >      
                             <Grid gutter="xl">
                                 <Grid.Col span={9}>

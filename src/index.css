@@ -139,6 +139,21 @@ body,
   animation-duration: 10s;
 }
 
+.circles li:nth-child(14){
+  left: 10%;
+  width: 270px;
+  height: 270px;
+  animation-delay: 0s;
+  animation-duration: 10s;
+}
+
+.circles li:nth-child(15){
+  left: 80%;
+  width: 30px;
+  height: 30px;
+  animation-delay: 0s;
+  animation-duration: 7s;
+}
 
 
 @keyframes animate {

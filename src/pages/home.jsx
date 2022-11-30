@@ -3,7 +3,9 @@ import MainLayout from "../layouts/MainLayout";
 import { FaRegMoneyBillAlt, FaUserFriends } from "react-icons/fa";
 import { useState } from 'react';
 import { useNavigate } from "react-router-dom";
-import { Flex, Card, AppShell, Header, Title, Button, Avatar, Modal, Space, Text } from '@mantine/core';
+import { Flex, Card, AppShell, Header, Title, Button, Avatar, Modal, Space, Text, Image } from '@mantine/core';
+
+import SGResident from '../assets/SGResident.png';
 
 function Home() {
     const navigate = useNavigate();
@@ -63,7 +65,7 @@ function Home() {
                     direction="column"
                     h="100vh"
                 >
-                    <Card  shadow="sm" p="lg" radius="lg" mih="400px" miw="1000px" withBorder> 
+                    <Card  shadow="sm" p="lg" radius="lg" mih="400px" miw="1000px" withBorder>   
                         <Flex
                             gap="70px"
                             justify="center"
