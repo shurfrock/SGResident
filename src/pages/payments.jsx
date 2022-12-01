@@ -1,12 +1,15 @@
 import MainLayout from "../layouts/MainLayout"
 
 import { useState } from 'react';
+import dayjs from "dayjs";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { IconAlertCircle } from '@tabler/icons';
 import { FaArrowLeft , FaTrashAlt, FaExclamationCircle, FaPen, FaPrint, FaSearch } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { Flex, Card, Grid, Title, Button, Modal, Table, Alert, Text, Space, Image, Loader } from '@mantine/core';
 
 import SGResidentWhite from '../assets/SGResidentWhite.png';
+import axios from '../configs/axios'
 
 function Payments(){
     const [opened, setOpened] = useState(false);
@@ -14,29 +17,53 @@ function Payments(){
     const [opened_mod, setOpened_mod] = useState(false);
     const [opened_det, setOpened_det] = useState(false);
     const [opened_pri, setOpened_pri] = useState(false);
-    const elements = [{ domicilio: 0, vialidad: 0, phoneNumber: 0, name: 0 , entre_vialidad_2: 0, referencia: 0, edad: 0, sexo: 0, situacion: 0, pagos_atrasados: 0, meses_pagados: 0, tipo_de_pago: 0, fecha: 0, hora: 0, cantidad: 0 }];
+    const [selectedId, setSelectedId] = useState(null)
 
-    const rows = elements.map((element) => ( 
-        <tr key={element.name}>    
-            <td>{element.domicilio}</td>
-            <td>{element.name}</td>
-            <td>{element.phoneNumber}</td>
-            <td>{element.vialidad}</td>
+    const queryClient = useQueryClient()
+
+    const { data } = useQuery({
+        queryKey: ['payments'],
+        queryFn: () => axios.get('/payment').then(res => res.data),
+    })
+    
+    const deleteMutation = useMutation({
+        mutationFn: ({ id }) => axios.delete(`/payment/${id}`),
+        onError: (error) => {
+            console.log('PaymentError', error)
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['payments'] })
+            setError('')
+            setOpened_add(false)
+        }
+    })
+
+    const payments = data || [];
+
+    const selectedPayment = payments.find(({ id }) => id === selectedId)
+
+    const rows = payments.map((element) => ( 
+        <tr key={element.id}>    
+            <td>{element?.resident?.address}</td>
+            <td>{element.resident.name}</td>
+            <td>{element.person}</td>
+            <td>{element.amount}</td>
+            <td>{element?.resident?.active ? 'Activo' : 'Inactivo'}</td>
             <td>
                 <Flex justify="center" align="center" gap="lg">
-                    <Button color="yellow" radius="xl" size="sm" onClick={() => setOpened_mod(true)}>
+                    <Button color="yellow" radius="xl" size="sm" onClick={() => { setSelectedId(element.id); setOpened_mod(true); }}>
                         <FaPen size="20px" color="white" />
                     </Button> 
                 
-                    <Button color="cyan" radius="xl" size="sm" onClick={() => setOpened_det(true)}>
+                    <Button color="cyan" radius="xl" size="sm" onClick={() => { setSelectedId(element.id); setOpened_det(true); }}>
                         <FaExclamationCircle size="20px" color="white" />
                     </Button> 
                 
-                    <Button color="red" radius="xl" size="sm" onClick={() => setOpened(true)}>
+                    <Button color="red" radius="xl" size="sm" onClick={() => { setSelectedId(element.id); setOpened(true); }}>
                         <FaTrashAlt size="20px" color="white" />   
                     </Button> 
                 
-                    <Button color="indigo" radius="xl" size="sm" onClick={() => setOpened_pri(true)}>
+                    <Button color="indigo" radius="xl" size="sm" onClick={() => { setSelectedId(element.id); setOpened_pri(true); }}>
                         <FaPrint size="20px" color="white" />   
                     </Button>    
                 </Flex>
@@ -44,42 +71,6 @@ function Payments(){
         </tr>       
       
     ));
-
-    const rows_1 = elements.map((element) => ( 
-        <tr key={element.name}>    
-            <td>{element.domicilio}</td>
-            <td>{element.name}</td>
-            <td>{element.phoneNumber}</td>
-            <td>{element.vialidad}</td>
-        </tr>       
-      
-    ));
-
-    const rows_2 = elements.map((element) => ( 
-        <tr key={element.name}>    
-            <td>{element.entre_vialidad_2}</td>
-            <td>{element.referencia}</td>
-            <td>{element.edad}</td>
-            <td>{element.sexo}</td>
-            <td>{element.situacion}</td>  
-        </tr>          
-    ));
-
-    const rows_3 = elements.map((element) => ( 
-        <tr key={element.name}>    
-            <td>{element.pagos_atrasados}</td>
-            <td>{element.meses_pagados}</td>
-        </tr>          
-    ));
-
-    const rows_4 = elements.map((element) => ( 
-        <tr key={element.name}>    
-            <td>{element.tipo_de_pago}</td>
-            <td>{element.fecha}</td>
-            <td>{element.hora}</td>
-            <td>{element.cantidad}</td>
-        </tr>          
-    ));   
 
     return (
         <MainLayout>
@@ -135,7 +126,17 @@ function Payments(){
                                 Al eliminar esta informacion del pago no se borrara en su totalidad del sistema, entrara en un estado de inactividad.
                             </Alert>
                                 <Button  onClick={() => setOpened(false)} color="gray" radius="lg" size="md">Cancelar</Button>
-                                <Button color="red"radius="lg" size="md" onClick={() => setOpened(false)} >Eliminar</Button> 
+                                <Button
+                                    color="red"
+                                    radius="lg"
+                                    size="md"
+                                    onClick={() => {
+                                        deleteMutation.mutate({ id: selectedId });
+                                        setOpened(false);
+                                    }}
+                                >
+                                    Eliminar
+                                </Button> 
                         </Flex>
                     </Modal>  
                     <Modal
@@ -151,49 +152,52 @@ function Payments(){
                             <thead>
                                 <tr>
                                     <th>Domicilio</th>
-                                    <th>Nombre</th>
-                                    <th>Telefono</th>
-                                    <th>Entre Vialidad</th>
-                                    <th></th>
+                                    <th>Nombre del Residente</th>
+                                    <th>Quien pagó</th>
+                                    <th>Cantidad</th>
+                                    <th>Tipo</th>
+                                    <th>Fecha de pago</th>
+                                    <th>Estado</th>
                                 </tr>
                             </thead> 
-                            <tbody>{rows_1}</tbody>
+                            <tbody>
+                                {selectedPayment && (
+                                    <tr>
+                                        <td>{selectedPayment?.resident?.address}</td>
+                                        <td>{selectedPayment?.resident?.name}</td>
+                                        <td>{selectedPayment.person}</td>
+                                        <td>{selectedPayment.amount}</td>
+                                        <td>{selectedPayment.type}</td>
+                                        <td>{dayjs(selectedPayment.createdAt).format('lll')}</td>
+                                        <td>{selectedPayment?.resident?.active ? 'Activo' : 'Inactivo'}</td>
+                                    </tr>  
+                                )} 
+                            </tbody>
                         </Table>  
                         <Table  striped horizontalSpacing="md" verticalSpacing="md" fontSize="md">
                             <thead>
                                 <tr>
+                                    <th>Entre vialidad 1</th>
                                     <th>Entre vialidad 2</th>
-                                    <th>Referncia</th>
+                                    <th>Telefono</th>
                                     <th>Edad</th>
                                     <th>Sexo</th>
-                                    <th>Situacion</th>
-                                    <th></th>
+                                    <th>Descripción</th>
                                 </tr>
                             </thead> 
-                            <tbody>{rows_2}</tbody>
-                        </Table>  
-                        <Table  striped horizontalSpacing="md" verticalSpacing="md" fontSize="md">
-                            <thead>
-                                <tr>
-                                    <th>Pagos Atrasados</th>
-                                    <th>Meses Pagados</th>
-                                    <th></th>
-                                </tr>
-                            </thead> 
-                            <tbody>{rows_3}</tbody>
-                        </Table>  
-                        <Table  striped horizontalSpacing="md" verticalSpacing="md" fontSize="md">
-                            <thead>
-                                <tr>
-                                    <th>Tipo de Pago</th>
-                                    <th>Fecha</th>
-                                    <th>Hora</th>
-                                    <th>Cantidad</th>
-                                    <th></th>
-                                </tr>
-                            </thead> 
-                            <tbody>{rows_4}</tbody>
-                        </Table>   
+                            <tbody>
+                                {selectedPayment && (
+                                    <tr>
+                                        <td>{selectedPayment?.resident?.firstRoad}</td>    
+                                        <td>{selectedPayment?.resident?.secondRoad}</td>
+                                        <td>{selectedPayment?.resident?.phone}</td>
+                                        <td>{selectedPayment?.resident?.age}</td>
+                                        <td>{selectedPayment?.resident?.gender}</td>
+                                        <td>{selectedPayment?.resident?.description}</td>  
+                                    </tr> 
+                                )}
+                            </tbody>
+                        </Table>      
                         <Space h="25px" />    
                         <Grid gutter="xl">
                             <Grid.Col span={4}  offset={4}> 
@@ -234,7 +238,7 @@ function Payments(){
                                     </th>
                                 </tr>
                             </thead> 
-                            <tbody>{rows_4}</tbody>
+                            {/* <tbody>{rows_4}</tbody>*/}
                         </Table> 
                         <Space h="25px" />
                         <Flex
@@ -261,8 +265,9 @@ function Payments(){
                         <thead>
                             <tr>
                                 <th>Domicilio</th>
-                                <th>Nombre</th>
-                                <th>Pagos Atrasados</th>
+                                <th>Nombre del Residente</th>
+                                <th>Quien pagó</th>
+                                <th>Cantidad</th>
                                 <th>Estado</th>
                                 <th></th>
                             </tr>

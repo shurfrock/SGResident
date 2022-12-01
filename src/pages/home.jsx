@@ -27,10 +27,7 @@ function Home() {
                 >
                     <Avatar alt="Usuario" color="cyan" radius="xl" size="100px" variant="filled" />
                     <Space h="35px" />
-                    <Title order={3} size="h3" c= "cyan"> Nombre Completo </Title>
-                    <Text fz="lg"> Nombre Completo </Text>
-                    <Title order={3} size="h3" c= "cyan"> Nombre de Usuario </Title>
-                    <Text fz="lg"> Nombre de Usuario </Text>
+                    <Title order={3} size="h1" c= "cyan"> Usuario </Title>
                     <Space h="35px" />
                 </Flex>
                 <Flex

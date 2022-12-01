@@ -15,7 +15,8 @@ body,
   background: -webkit-linear-gradient(to left, #98e8e9, #73C1C2);  
   width: 100%;
   height:100vh;
-  
+  position: absolute;
+  top: 0;
 }
 
 .circles{

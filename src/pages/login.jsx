@@ -116,7 +116,6 @@ function Login(){
                     <Group position="center">
                         <Button  onClick={() => setOpened(true)} variant="subtle" color="cyan" radius="lg" size="xl">Iniciar Sesion</Button>
                     </Group>
-                    
                     <Button variant="subtle" color="cyan" radius="lg" size="xl" onClick={() => navigate('/register')}>Registrarse</Button>
                 </Flex>
             </Card>

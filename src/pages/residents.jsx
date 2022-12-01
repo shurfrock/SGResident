@@ -4,14 +4,12 @@ import { useState } from 'react';
 import { z } from 'zod'
 import { useNavigate } from "react-router-dom";
 import { IconAlertCircle } from '@tabler/icons';
-import { useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm, zodResolver } from '@mantine/form';
-import { TimeInput, DatePicker} from '@mantine/dates';
 import { Flex, Card, Grid, TextInput, Title, Text, Button, Modal, Table, Select, Alert, NativeSelect, Space, Image, NumberInput } from '@mantine/core';
-import { useQuery } from '@tanstack/react-query'
+import { FaArrowLeft, FaTrashAlt, FaExclamationCircle, FaPen, FaSearch, FaDonate } from "react-icons/fa";
 
 import SGResidentWhite from '../assets/SGResidentWhite.png';
-import { FaArrowLeft, FaTrashAlt, FaExclamationCircle, FaPen, FaSearch, FaDonate } from "react-icons/fa";
 import axios from "../configs/axios";
 
 const schema = z.object({
@@ -25,6 +23,11 @@ const schema = z.object({
     secondRoad: z.string().min(5),
 })
 
+const paymentSchema = z.object({
+    amount: z.number().positive(),
+    person: z.string().min(5),
+})
+
 function Residents(){ 
     const navigate = useNavigate();
     const [error, setError] = useState('');
@@ -36,7 +39,9 @@ function Residents(){
     const [datePicker, setDatePicker] = useState(new Date())
     const [timeInput, setTimeInput] = useState(new Date())
     const [selectedId, setSelectedId] = useState(null)
-    console.log("🚀 ~ file: residents.jsx:39 ~ Residents ~ selectedId", selectedId)
+    const [selectedType, setSelectedType] = useState('Efectivo')
+
+    const queryClient = useQueryClient()
 
     const form = useForm({
         validate: zodResolver(schema),
@@ -49,19 +54,27 @@ function Residents(){
             description: '',
             firstRoad: '',
             secondRoad: '',
+            
         },
     })
 
-    const { isLoading, data } = useQuery({
+    const paymentForm = useForm({
+        validate: zodResolver(paymentSchema),
+        initialValues: {
+            person: '',
+            amount: 1,
+        }
+    })
+
+    const { data } = useQuery({
         queryKey: ['resident'],
         queryFn: () => axios.get('/resident').then(res => res.data),
     })
-    console.log("🚀 ~ file: residents.jsx:59 ~ Residents ~ data", data)
 
     const mutation = useMutation({
         mutationFn: ({ name, address, phone, age, gender, description, firstRoad, secondRoad }) => axios.post('/resident', { name, address, phone, age, gender, description, firstRoad, secondRoad }),
         onError: (error) => {
-            console.log()
+            console.log('Resident error', error)
         },
         onSuccess: () => {
             setError('')
@@ -69,9 +82,41 @@ function Residents(){
         }
     })
 
+    const deleteResidentMutation = useMutation({
+        mutationFn: ({ id }) => axios.delete(`/resident/${id}`),
+        onError: (error) => {
+            console.log('PaymentError', error)
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['resident'] })
+            setError('')
+            setOpened_add(false)
+        }
+    })
+
+    const paymentMutation = useMutation({
+        mutationFn: (values) => axios.post('/payment', values),
+        onError: (error) => {
+            console.log('Resident error', error)
+        },
+        onSuccess: () => {
+            setOpened_addP(false)
+        }
+    })
+
     const handleOnSubmit = (values) => {
         console.log(values)
+        setError('')
         mutation.mutate(values) 
+    }
+
+    const handlePaymentSubmit = (paymentValues) => {
+        console.log('paymentValues', paymentValues);
+        paymentMutation.mutate({
+            ...paymentValues,
+            residentId: selectedId,
+            type: selectedType,
+        })
     }
 
     const rows = (data || []).map((element) => ( 
@@ -96,9 +141,7 @@ function Residents(){
                     </Button>   
                 </Flex>
             </td>
-
         </tr>       
-      
     ));
 
     return(
@@ -135,7 +178,17 @@ function Residents(){
                                 </Alert>
 
                                     <Button onClick={() => setOpened(false)} color="gray" radius="lg" size="md">Cancelar</Button>
-                                    <Button onClick={() => setOpened(false)} color="red"radius="lg" size="md">Eliminar</Button> 
+                                    <Button
+                                        onClick={() => {
+                                            deleteResidentMutation.mutate({ id: selectedId })
+                                            setOpened(false);
+                                        }}
+                                        color="red"
+                                        radius="lg"
+                                        size="md"
+                                    >
+                                        Eliminar
+                                    </Button> 
                             </Flex>
                         </Modal> 
                         <Modal
@@ -147,105 +200,66 @@ function Residents(){
                             overlayOpacity={0.55}
                             overlayBlur={3}
                             transitionTimingFunction="ease"
-                        >      
-                            <Grid>
-                                <Grid.Col span={7}>
-                                    <TextInput
-                                        placeholder="Nombre Titular"
-                                        label="Nombre Titular"
-                                        radius="lg"
-                                        size="sm"
-                                        withAsterisk
-                                    />   
-                                    <Space h="sm" />
-                                    <TextInput
-                                        placeholder="Quien realiza el pago"
-                                        label="Quien realiza el pago"
-                                        radius="lg"
-                                        size="sm"
-                                        withAsterisk
-                                    /> 
-                                </Grid.Col>  
-                                <Grid.Col span={6}>
-                                    <TextInput
-                                        placeholder="Domicilio"
-                                        label="Domicilio"
-                                        radius="lg"
-                                        size="sm"
-                                        withAsterisk
-                                    />   
-                                </Grid.Col>   
-                                <Grid.Col span={3}> 
-                                    <TimeInput
-                                        defaultValue={new Date()}
-                                        radius="lg"
-                                        label="Hora"
-                                        format="12"
-                                        amLabel="AM"
-                                        pmLabel="PM"
-                                        withAsterisk
-                                        value={timeInput}
-                                        onChange={setTimeInput}
-
-                                    />
-                                </Grid.Col>  
-                                <Grid.Col span={3}> 
-                                    <DatePicker
-                                        defaultValue={new Date()}
-                                        radius="lg"
-                                        placeholder="Fecha"
-                                        label="Fecha"
-                                        inputFormat="MM/DD/YYYY"
-                                        labelFormat="MM/YYYY"
-                                        withAsterisk
-                                        value={datePicker}
-                                        onChange={setDatePicker}
-                                    />
-                                </Grid.Col>  
-                                <Grid.Col span={5}>
-                                    <Text fz="md" fw={500}>Concepto</Text>
-                                    <Text fz="md">Pago de Residente</Text>
-                                </Grid.Col>   
-                                <Grid.Col span={6}> 
-                                    <Text fz="md" fw={500}>Cantidad a pagar</Text>
-                                    <Text fz="md">$320.00(trescientos veinte pesos)</Text>
-                                </Grid.Col>  
-                                <Grid.Col span={5}>
-                                    <TextInput
-                                        placeholder="Cantidad Recibida"
-                                        label="Cantidad Recibida"
-                                        radius="lg"
-                                        size="sm"
-                                        withAsterisk
-                                    />  
-                                </Grid.Col>
-                                <Grid.Col span={4}> 
-                                    <Select
-                                            label="Tipo de Pago"
-                                            placeholder="Tipo de Pago"
-                                            data={[
-                                                { value: 'Efectivo', label: 'Efectivo' },
-                                                { value: 'Transferencia', label: 'Transferencia' },
-                                                { value: 'Deposito', label: 'Deposito' },
-                                                { value: 'Cheque', label: 'Cheque' },
-                                            ]}
-                                            
+                        >
+                            <form onSubmit={paymentForm.onSubmit(handlePaymentSubmit)}>
+                                <Grid>
+                                    <Grid.Col span={7}>
+                                        <TextInput
+                                            placeholder="Quien realiza el pago"
+                                            label="Quien realiza el pago"
                                             radius="lg"
-                                        />
-                                </Grid.Col>
-                                <Grid.Col span={4}  offset={4}> 
-                                    <Flex
-                                        mih={15}
-                                        gap="md"
-                                        justify="center"
-                                        align="flex-end"
-                                        direction="row"
-                                        wrap="wrap"
-                                        >
-                                            <Button onClick={() => setOpened_addP(false)} color="green" radius="lg" size="md">Agregar Pago</Button>
-                                    </Flex> 
-                                </Grid.Col>  
-                            </Grid> 
+                                            size="sm"
+                                            withAsterisk
+                                            {...paymentForm.getInputProps('person')}
+                                        /> 
+                                    </Grid.Col>   
+                                    <Grid.Col span={5}>
+                                        <Text fz="md" fw={500}>Concepto</Text>
+                                        <Text fz="md">Pago de Residente</Text>
+                                    </Grid.Col>   
+                                    <Grid.Col span={6}> 
+                                        <Text fz="md" fw={500}>Cantidad a pagar</Text>
+                                        <Text fz="md">$320.00(trescientos veinte pesos)</Text>
+                                    </Grid.Col>  
+                                    <Grid.Col span={5}>
+                                        <NumberInput
+                                            placeholder="Cantidad Recibida"
+                                            label="Cantidad Recibida"
+                                            radius="lg"
+                                            size="sm"
+                                            withAsterisk
+                                            {...paymentForm.getInputProps('amount')}
+                                        />  
+                                    </Grid.Col>
+                                    <Grid.Col span={4}> 
+                                        <Select
+                                                label="Tipo de Pago"
+                                                placeholder="Tipo de Pago"
+                                                data={[
+                                                    { value: 'Efectivo', label: 'Efectivo' },
+                                                    { value: 'Transferencia', label: 'Transferencia' },
+                                                    { value: 'Deposito', label: 'Deposito' },
+                                                    { value: 'Cheque', label: 'Cheque' },
+                                                ]}
+                                                value={selectedType}
+                                                onChange={setSelectedType}
+                                                
+                                                radius="lg"
+                                            /> 
+                                        <Space h="25px" />
+                                        <Flex
+                                            mih={15}
+                                            gap="md"
+                                            justify="center"
+                                            align="flex-end"
+                                            direction="row"
+                                            wrap="wrap"
+                                            >
+                                                <Button type="submit"  color="green" radius="lg" size="md">Agregar Pago</Button>
+                                        </Flex> 
+                                    </Grid.Col>  
+                                </Grid> 
+                            </form>
                         </Modal>
                         <Modal
                             onClose={() => setOpened_add(false)}
@@ -374,7 +388,7 @@ function Residents(){
                         >    
                         
                             <Text fz="xl" fw={700}>Nombre Completo</Text>
-                            <Text fz="lg" fw={400}>Nombre Completo</Text> 
+                            <Text fz="lg" fw={400}></Text> 
                             <Space h="sm" />
                             <Grid>
                                 <Grid.Col span={5}>
